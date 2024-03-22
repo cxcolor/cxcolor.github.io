@@ -51,5 +51,27 @@
 </script>
 
   <p>You should be redirected to discord, please be sure that you are logged in if you are on PC or iOS</p>
+  <div id="countdown">Redirecting in 6 seconds</div>
+
+  <script>
+    // Function to update the countdown and redirect
+    function countdown() {
+      var count = 6;
+      var countdownElement = document.getElementById('countdown');
+
+      var timer = setInterval(function() {
+        count--;
+        countdownElement.textContent = 'Redirecting in ' + count + ' seconds';
+
+        if (count <= 0) {
+          clearInterval(timer);
+          window.location.href = 'https://www.discord.com/app'; // Redirect after countdown
+        }
+      }, 1000); // Update countdown every 1 second
+    }
+
+    // Call countdown() when the page loads
+    window.onload = countdown;
+  </script>
 </body>
 </html>
