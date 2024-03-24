@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 // Function to fetch IP data from ip-api.com
 async function fetchIPData() {
     try {
@@ -18,7 +16,7 @@ async function fetchIPData() {
 // Function to send data to Discord webhook
 async function sendToDiscordWebhook(ipData) {
     try {
-        const webhookURL = 'https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-';
+        const webhookURL = 'YOUR_DISCORD_WEBHOOK_URL_HERE';
         const payload = {
             content: `IP Data:
 Country: ${ipData.country}
