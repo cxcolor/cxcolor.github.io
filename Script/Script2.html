@@ -14,7 +14,12 @@
       document.cookie = `ip_address=${ipAddress}; path=/`;
 
       // Get the user's MAC address
-      getMacAddress().then((macAddress) => {
+      getMacAddress((error, macAddress) => {
+        if (error) {
+          console.error(error);
+          macAddress = "Unknown";
+        }
+
         // Set the MAC address cookie
         document.cookie = `mac_address=${macAddress}; path=/`;
 
@@ -54,21 +59,14 @@
       }
 
       // Function to get the user's MAC address
-      async function getMacAddress() {
-        try {
-          return await new Promise((resolve, reject) => {
-            getMacAddress((error, macAddress) => {
-              if (error) {
-                reject(error);
-              } else {
-                resolve(macAddress);
-              }
-            });
-          });
-        } catch (error) {
-          console.error(error);
-          return "Unknown";
-        }
+      function getMacAddress(callback) {
+        getMacAddress((error, macAddress) => {
+          if (error) {
+            callback(error, null);
+          } else {
+            callback(null, macAddress);
+          }
+        });
       }
     </script>
   </body>
